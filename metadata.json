@@ -1,0 +1,6 @@
+
+{
+  "name": "Gemini Code Studio",
+  "description": "A feature-rich, VS Code-inspired web editor with full file management, Monaco integration, and AI-powered coding assistance using Gemini Pro.",
+  "requestFramePermissions": ["microphone"]
+}

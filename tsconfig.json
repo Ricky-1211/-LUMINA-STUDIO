@@ -1,5 +1,14 @@
 {
-  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
+  "include": [
+    "client/src/**/*",
+    "components/**/*",
+    "services/**/*",
+    "Dog/**/*",
+    "shared/**/*",
+    "server/**/*",
+    "*.ts",
+    "*.tsx"
+  ],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
     "incremental": true,

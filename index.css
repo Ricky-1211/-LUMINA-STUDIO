@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  background: #1e1e1e;
+}
+
+.monaco-editor {
+  padding-top: 8px;
+}
+
+/* Custom scrollbar for webkit */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Font for code */
+.code-font {
+  font-family: 'Fira Code', monospace;
+}
+
+/* Monaco Editor customizations */
+.monaco-editor .margin {
+  background-color: #1e1e1e !important;
+}
+
+/* Activity bar styling */
+.activity-bar {
+  background: #333333;
+  border-right: 1px solid #1e1e1e;
+}
+
+/* Status bar styling */
+.status-bar {
+  background: #007acc;
+  color: white;
+  font-size: 12px;
+}

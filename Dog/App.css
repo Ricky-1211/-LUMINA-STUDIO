@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700&display=swap');
+
+main {
+  position: relative;
+  min-height: 300vh;
+  background: radial-gradient(circle at top, #151925 0%, #0b0b0b 50%, #070707 100%);
+  color: #f5f3ef;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+}
+
+main * {
+  box-sizing: border-box;
+}
+
+.enter-editor {
+  position: fixed;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.6));
+  color: #ffffff;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  animation: floatPulse 2.6s ease-in-out infinite;
+}
+
+.enter-editor__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #007acc;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.enter-editor:hover {
+  transform: translateY(-50%) translateX(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(0, 122, 204, 0.7);
+}
+
+@keyframes floatPulse {
+  0%,
+  100% {
+    transform: translateY(-50%);
+  }
+  50% {
+    transform: translateY(-56%);
+  }
+}
+
+.images {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.images img {
+  position: absolute;
+  width: clamp(140px, 18vw, 260px);
+  opacity: 0.18;
+  filter: grayscale(0.2) saturate(0.7) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.5));
+  mix-blend-mode: screen;
+}
+
+#tomorrowland { top: 8%; left: 6%; width: clamp(150px, 20vw, 280px); }
+#navy-pier { top: 12%; right: 10%; }
+#msi-chicago { top: 42%; left: 10%; }
+#phone { bottom: 12%; right: 14%; width: clamp(120px, 16vw, 220px); }
+#kikk { bottom: 18%; left: 22%; }
+#kennedy { top: 56%; right: 8%; width: clamp(180px, 22vw, 320px); }
+#opera { bottom: 32%; right: 32%; width: clamp(140px, 18vw, 260px); }
+
+section {
+  position: relative;
+  z-index: 2;
+}
+
+#section-1 {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 48px 18px;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  color: #e1dfd9;
+}
+
+nav .nav-elem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.85;
+}
+
+nav .nav-elem svg {
+  width: 84px;
+  height: auto;
+}
+
+.middle {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 40px 48px;
+  min-height: 55vh;
+}
+
+.middle .left h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(44px, 9vw, 130px);
+  line-height: 0.9;
+  margin: 0;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 48px 48px;
+  font-size: 13px;
+  color: #d1cec7;
+}
+
+.bottom .right {
+  max-width: 260px;
+}
+
+.first-line,
+.second-line {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.first-line {
+  top: 92px;
+}
+
+.second-line {
+  bottom: 90px;
+}
+
+#section-2 {
+  min-height: 100vh;
+  padding: 80px 48px;
+}
+
+.titles {
+  display: grid;
+  gap: 20px;
+}
+
+.title {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.title small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.36em;
+  color: #8f8f8f;
+}
+
+.title h1 {
+  font-size: clamp(26px, 4.5vw, 54px);
+  margin: 6px 0 0;
+  font-weight: 600;
+}
+
+.title:hover {
+  color: #ffffff;
+  transform: translateX(6px);
+}
+
+#section-3 {
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 20px 24px;
+    letter-spacing: 0.18em;
+  }
+
+  .middle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 20px 24px 40px;
+  }
+
+  .bottom {
+    flex-direction: column;
+    gap: 16px;
+    padding: 12px 24px 40px;
+  }
+
+  .first-line,
+  .second-line {
+    left: 24px;
+    right: 24px;
+  }
+
+  #section-2 {
+    padding: 64px 24px;
+  }
+}

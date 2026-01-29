@@ -1,4 +1,4 @@
-# VS Code Clone - Modern Web-Based Code Editor
+# LUMINA STUDIO - Modern Web-Based Code Editor
 
 A professional, minimalist code editor built with React, TypeScript, and Monaco Editor. Designed with a clean monochromatic aesthetic and optimized for developer productivity.
 

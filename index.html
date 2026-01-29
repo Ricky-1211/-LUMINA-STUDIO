@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LUMINA Code Studio</title>
+    <!-- Removed Tailwind CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        overflow: hidden;
+        background: #1e1e1e;
+        color: #cccccc;
+      }
+      .monaco-editor {
+        padding-top: 8px;
+      }
+      /* Custom scrollbar for webkit */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1e1e1e;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #444;
+      }
+      
+      /* Basic Tailwind-like styles */
+      .flex { display: flex; }
+      .flex-col { flex-direction: column; }
+      .items-center { align-items: center; }
+      .justify-center { justify-content: center; }
+      .justify-between { justify-content: space-between; }
+      .h-screen { height: 100vh; }
+      .overflow-hidden { overflow: hidden; }
+      .bg-\[\#1e1e1e\] { background-color: #1e1e1e; }
+      .text-gray-300 { color: #d1d5db; }
+      .text-gray-500 { color: #6b7280; }
+      .text-white { color: #ffffff; }
+      .text-blue-400 { color: #60a5fa; }
+      .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+      .font-bold { font-weight: 700; }
+      .tracking-tight { letter-spacing: -0.025em; }
+      .opacity-30 { opacity: 0.3; }
+      .select-none { user-select: none; }
+      .space-y-4 > * + * { margin-top: 1rem; }
+      .space-x-4 > * + * { margin-left: 1rem; }
+      .gap-4 { gap: 1rem; }
+      .p-4 { padding: 1rem; }
+      .mt-8 { margin-top: 2rem; }
+      .rounded-lg { border-radius: 0.5rem; }
+      .hover\:bg-\[\#37373d\]:hover { background-color: #37373d; }
+      .transition-colors { transition: background-color 0.15s ease-in-out; }
+      .grid { display: grid; }
+      .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+      .text-\[\#252526\] { background-color: #252526; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@monaco-editor/react": "https://esm.sh/@monaco-editor/react@^4.7.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/main.tsx"></script>
+    <script>
+      // Fallback for browsers that don't support import maps
+      if (!HTMLScriptElement.supports?.('importmap')) {
+        console.warn('Import maps not supported, loading polyfills...');
+        const polyfill = document.createElement('script');
+        polyfill.src = 'https://unpkg.com/es-module-shims@1.8.2/dist/es-module-shims.js';
+        polyfill.async = true;
+        document.head.appendChild(polyfill);
+      }
+    </script>
+  </body>
+</html>
