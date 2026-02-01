@@ -122,7 +122,7 @@ const CodeEditor: React.FC<EditorProps> = ({
         cursorSmoothCaretAnimation: 'on',
         renderLineHighlight: 'line',
         selectionHighlight: true,
-        occurrencesHighlight: true,
+        occurrencesHighlight: 'singleFile',
         codeLens: false,
         folding: true,
         lineDecorationsWidth: 0,
@@ -132,16 +132,12 @@ const CodeEditor: React.FC<EditorProps> = ({
         suggestOnTriggerCharacters: true,
         acceptSuggestionOnEnter: 'on',
         tabCompletion: 'on',
-        wordBasedSuggestions: true,
+        wordBasedSuggestions: 'currentDocument',
         parameterHints: { enabled: true },
         hover: { enabled: true },
         definitionLinkOpensInPeek: false,
         links: true,
         colorDecorators: true,
-        lightbulb: { enabled: true },
-        codeActionsOnSave: {
-          'source.fixAll': 'explicit'
-        },
         // Enhanced scrolling options
         scrollbar: {
           vertical: 'visible',
@@ -167,8 +163,6 @@ const CodeEditor: React.FC<EditorProps> = ({
         renderValidationDecorations: 'on',
         renderLineHighlightOnlyWhenFocus: false,
         // Accessibility improvements
-        accessibilityHelpPageVisible: false,
-        screenReaderAnnounceInlineSuggestion: false,
         // Enhanced editor behavior
         autoIndent: 'advanced',
         formatOnPaste: true,
@@ -177,7 +171,6 @@ const CodeEditor: React.FC<EditorProps> = ({
         // Line rendering
         renderWhitespace: 'selection',
         renderControlCharacters: false,
-        renderIndentGuides: true,
         // Selection behavior
         selectOnLineNumbers: true,
         // Multi-cursor support
@@ -188,7 +181,7 @@ const CodeEditor: React.FC<EditorProps> = ({
           autoFindInSelection: 'never',
           cursorMoveOnType: true,
           loop: true,
-          seedSearchStringFromSelection: false
+          seedSearchStringFromSelection: 'never'
         }
       }}
     />
