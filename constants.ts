@@ -12,9 +12,11 @@ import {
 } from 'lucide-react';
 import { FileNode, Tool, ToolCategory } from './types';
 
-// Helper function to create icon elements
-const createIcon = (IconComponent: any, size: number) => 
-  React.createElement(IconComponent, { size });
+// Helper function to create icon components (not elements)
+const createIcon = (IconComponent: any, size: number) => ({
+  component: IconComponent,
+  size
+});
 
 // Tool Categories
 export const TOOL_CATEGORIES: ToolCategory[] = [

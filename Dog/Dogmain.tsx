@@ -39,6 +39,7 @@ function DogMain({ onEnterEditor }: DogMainProps) {
             top: 0,
             left: 0,
             zIndex: 1,
+            pointerEvents: "none"
           }} >
           <Dog />
         </Canvas>
@@ -80,7 +81,7 @@ function DogMain({ onEnterEditor }: DogMainProps) {
             <div className="left"></div>
             <div className="right">
               <p>
-                Dogstudio is a multidisciplinary <br />
+                LUMINA STUDIO is a multidisciplinary <br />
                 creative studio at the intersection <br />
                 of art, design and technology.
               </p>
@@ -107,7 +108,7 @@ function DogMain({ onEnterEditor }: DogMainProps) {
             </div>
             <div img-title="phone" className="title">
               <small>2020 - ONGOING</small>
-              <h1>This Was Louise’s Phone</h1>
+              <h1>This Was Louise's Phone</h1>
             </div>
             <div img-title="kikk" className="title">
               <small>2020 - ONGOING</small>

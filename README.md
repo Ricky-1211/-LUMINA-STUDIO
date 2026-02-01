@@ -115,7 +115,7 @@ interface EditorState {
 
 ### Installation
 ```bash
-cd vscode-clone
+cd lumina-studio
 pnpm install
 ```
 

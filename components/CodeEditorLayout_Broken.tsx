@@ -12,15 +12,11 @@ import Terminal from './Terminal';
 import ToolsPanel from './ToolsPanel';
 import QuickOpenModal from './QuickOpenModal';
 import SearchView, { SearchMatch } from './SearchView';
-import SearchPanel from './SearchPanel';
 import TopMenuBar from './TopMenuBar';
 import CommandPalette from './CommandPalette';
-import GoToLineDialog from './GoToLineDialog';
 import { FileNode, SidebarView, Tool } from '../types';
 import { INITIAL_FILES, TOOL_CATEGORIES, RECENT_TOOLS } from '../constants';
-import { useEditorStore, type EditorFile } from '../store/editorStore';
-import { useUIStore } from '../store/uiStore';
-import { useTerminalStore } from '../store/terminalStore';
+import { useEditorStore, useUIStore, useFileSystemStore, useTerminalStore } from '../store';
 import {
     explainCode,
     refactorCode,
@@ -35,38 +31,33 @@ type PendingLocation = {
 };
 
 const CodeEditorLayout: React.FC = () => {
+    // Editor store - file management and editor state
     const {
         files: storeFiles, openTabs, activeTabId, currentLine, currentColumn,
         addFile, updateFile, deleteFile, openFile, closeFile, setActiveTab,
-        setCursorPosition, setScrollPosition, setViewportSize, setEditorInstance,
-        scrollToLine, copySelection, cutSelection, pasteText, selectAll,
-        undo, redo, formatDocument, toggleComment
+        setCursorPosition
     } = useEditorStore();
 
+    // UI store - layout and modal states
     const {
-        sidebarVisible: sidebarOpen,
-        commandPaletteOpen,
-        searchPanelOpen,
-        goToLineOpen,
-        keyboardShortcutsOpen,
-        toggleSidebar,
-        toggleCommandPalette,
-        toggleSearchPanel,
-        toggleGoToLine,
-        toggleKeyboardShortcuts
+        sidebarVisible, toggleSidebar, commandPaletteOpen, toggleCommandPalette,
+        quickOpenOpen, toggleQuickOpen, searchPanelOpen, toggleSearchPanel,
+        goToLineOpen, toggleGoToLine, keyboardShortcutsOpen, toggleKeyboardShortcuts,
+        activeSidebarView, setActiveSidebarView, panelVisible, setActivePanel
     } = useUIStore();
 
-    const { terminalVisible, toggleTerminal } = useTerminalStore();
+    // File system store - file tree management
+    const { files: fileSystemFiles, createFile, createFolder, deleteFile: deleteFileSystemFile } = useFileSystemStore();
+
+    // Terminal store - terminal state
+    const { terminalVisible: terminalVisibleFromStore, toggleTerminal } = useTerminalStore();
 
     const [files, setFiles] = useState<Record<string, FileNode>>(INITIAL_FILES);
-    const [sidebarVisible, setSidebarVisible] = useState(true);
-    const [activeSidebarView, setActiveSidebarView] = useState<SidebarView>('explorer');
     const [aiWorking, setAiWorking] = useState(false);
     const [toolsPanelVisible, setToolsPanelVisible] = useState(false);
     const [activeTool, setActiveTool] = useState<Tool | null>(null);
     const [recentTools, setRecentTools] = useState<Tool[]>(RECENT_TOOLS);
     const [showAllTools, setShowAllTools] = useState(false);
-    const [quickOpenVisible, setQuickOpenVisible] = useState(false);
     const [pendingLocation, setPendingLocation] = useState<PendingLocation | null>(null);
 
     const editorRef = useRef<any>(null);
@@ -85,11 +76,7 @@ const CodeEditorLayout: React.FC = () => {
         const savedRecentTools = localStorage.getItem('gemini-studio-recent-tools');
         if (savedRecentTools) {
             try {
-                const toolIds = JSON.parse(savedRecentTools);
-                const tools = toolIds.map((id: string) =>
-                    TOOL_CATEGORIES.flatMap(cat => cat.tools).find(tool => tool.id === id)
-                ).filter(Boolean);
-                setRecentTools(tools);
+                setRecentTools(JSON.parse(savedRecentTools));
             } catch (e) {
                 console.error("Failed to load recent tools", e);
             }
@@ -101,7 +88,7 @@ const CodeEditorLayout: React.FC = () => {
     }, [files]);
 
     useEffect(() => {
-        localStorage.setItem('gemini-studio-recent-tools', JSON.stringify(recentTools.map(t => t.id)));
+        localStorage.setItem('gemini-studio-recent-tools', JSON.stringify(recentTools));
     }, [recentTools]);
 
     useEffect(() => {
@@ -121,7 +108,7 @@ const CodeEditorLayout: React.FC = () => {
 
             if (ctrlOrMeta && key === 'p') {
                 e.preventDefault();
-                setQuickOpenVisible(true);
+                toggleQuickOpen();
                 return;
             }
 
@@ -151,54 +138,7 @@ const CodeEditorLayout: React.FC = () => {
 
         window.addEventListener('keydown', handleKeyDown, true);
         return () => window.removeEventListener('keydown', handleKeyDown, true);
-    }, [toggleCommandPalette, toggleSearchPanel, toggleGoToLine]);
-
-    const handleCursorPositionChange = useCallback((line: number, column: number) => {
-        setCursorPosition(line, column);
-    }, [setCursorPosition]);
-
-    const handleScrollChange = useCallback((scrollTop: number, scrollLeft: number) => {
-        setScrollPosition(scrollTop, scrollLeft);
-    }, [setScrollPosition]);
-
-    const handleViewportChange = useCallback((height: number, width: number) => {
-        setViewportSize(height, width);
-    }, [setViewportSize]);
-
-    const handleEditorMount = useCallback((editor: any, monaco: any) => {
-        editorRef.current = editor;
-        setEditorInstance(editor);
-        
-        // Set up enhanced keyboard shortcuts
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-            // Save functionality
-            console.log('Save command triggered');
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyA, () => {
-            selectAll();
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyZ, () => {
-            undo();
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyZ, () => {
-            redo();
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Slash, () => {
-            toggleComment();
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, () => {
-            toggleSearchPanel();
-        });
-        
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyG, () => {
-            toggleGoToLine();
-        });
-    }, [setEditorInstance, selectAll, undo, redo, toggleComment, toggleSearchPanel, toggleGoToLine]);
+    }, [toggleCommandPalette, toggleSearchPanel, toggleGoToLine, toggleTerminal]);
 
     const handleFileSelect = useCallback((id: string) => {
         openFile(id);
@@ -220,70 +160,22 @@ const CodeEditorLayout: React.FC = () => {
         if (!editorRef.current) return;
 
         const { lineNumber, column, length } = pendingLocation;
-        
-        // Use requestAnimationFrame for smooth scrolling
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                try {
-                    const editor = editorRef.current;
-                    
-                    // Set cursor position with smooth animation
-                    editor.setPosition({ 
-                        lineNumber: Math.max(1, lineNumber), 
-                        column: Math.max(1, column) 
-                    });
-                    
-                    // Reveal position in center with smooth scrolling
-                    editor.revealPositionInCenter({ 
-                        lineNumber: Math.max(1, lineNumber), 
-                        column: Math.max(1, column) 
-                    });
-                    
-                    // Set selection with highlight
-                    editor.setSelection({
-                        startLineNumber: Math.max(1, lineNumber),
-                        startColumn: Math.max(1, column),
-                        endLineNumber: Math.max(1, lineNumber),
-                        endColumn: Math.max(1, column + Math.max(1, length)),
-                    });
-                    
-                    // Focus editor
-                    editor.focus();
-                    
-                    // Add visual highlight effect
-                    const decorations = editor.createDecorationsCollection();
-                    const decoration = {
-                        range: {
-                            startLineNumber: Math.max(1, lineNumber),
-                            startColumn: Math.max(1, column),
-                            endLineNumber: Math.max(1, lineNumber),
-                            endColumn: Math.max(1, column + Math.max(1, length))
-                        },
-                        options: {
-                            className: 'lumina-search-highlight',
-                            isWholeLine: false,
-                            minimap: {
-                                color: '#00d9ff',
-                                position: 'leader'
-                            }
-                        }
-                    };
-                    
-                    decorations.set([decoration]);
-                    
-                    // Clear highlight after 2 seconds
-                    setTimeout(() => {
-                        decorations.clear();
-                    }, 2000);
-                    
-                } catch (error) {
-                    console.warn('Failed to navigate to position:', error);
-                } finally {
-                    setPendingLocation(null);
-                }
-            });
+            try {
+                editorRef.current.setPosition({ lineNumber, column });
+                editorRef.current.revealPositionInCenter({ lineNumber, column });
+                editorRef.current.setSelection({
+                    startLineNumber: lineNumber,
+                    startColumn: column,
+                    endLineNumber: lineNumber,
+                    endColumn: column + Math.max(1, length),
+                });
+                editorRef.current.focus();
+            } finally {
+                setPendingLocation(null);
+            }
         });
-    }, [pendingLocation, activeTabId]);
+    }, [activeTabId, pendingLocation]);
 
     const closeTab = useCallback((id: string, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -294,46 +186,19 @@ const CodeEditorLayout: React.FC = () => {
         const name = prompt(`Enter ${type} name:`);
         if (!name) return;
 
-        const id = `${name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
-        const newFile: FileNode = {
-            id,
-            name,
-            type,
-            parentId,
-            content: type === 'file' ? '' : undefined,
-            language: name.endsWith('.ts') || name.endsWith('.tsx') ? 'typescript' :
-                name.endsWith('.js') || name.endsWith('.jsx') ? 'javascript' :
-                    name.endsWith('.css') ? 'css' :
-                        name.endsWith('.html') ? 'html' :
-                            name.endsWith('.json') ? 'json' : 'text'
-        };
-
-        const newEditorFile: EditorFile = {
-            id,
-            name,
-            path: `/${name}`,
-            content: type === 'file' ? '' : '',
-            language: newFile.language || 'text',
-            isDirty: false,
-            isOpen: true,
-            lastModified: Date.now(),
-            encoding: 'utf-8',
-            lineEnding: 'LF',
-            indentSize: 4,
-            indentUsingSpaces: true,
-            trimWhitespace: true
-        };
-
-        addFile(newEditorFile);
-        if (type === 'file') handleFileSelect(id);
-    }, [addFile, handleFileSelect]);
+        if (type === 'file') {
+            createFile(parentId, name);
+        } else {
+            createFolder(parentId, name);
+        }
+    }, [createFile, createFolder]);
 
     const handleDeleteFile = useCallback((id: string) => {
         if (id === 'root') return;
         if (!confirm('Are you sure you want to delete this?')) return;
 
-        deleteFile(id);
-    }, [deleteFile]);
+        deleteFileSystemFile(id);
+    }, [deleteFileSystemFile]);
 
     const handleContentChange = useCallback((value: string | undefined) => {
         if (activeTabId && value !== undefined) {
@@ -347,20 +212,15 @@ const CodeEditorLayout: React.FC = () => {
 
         setRecentTools(prev => {
             const filtered = prev.filter(t => t.id !== tool.id);
-            const newTools = [tool, ...filtered].slice(0, 5);
-            localStorage.setItem('gemini-studio-recent-tools', JSON.stringify(newTools.map(t => t.id)));
-            return newTools;
+            return [tool, ...filtered].slice(0, 5);
         });
     }, []);
 
     const handleToolAction = useCallback(async (action: string) => {
-        if (!activeTabId) return;
+        if (!activeTabId || !files[activeTabId]?.content) return;
 
-        const currentFile = storeFiles[activeTabId];
-        if (!currentFile?.content) return;
-
-        const currentContent = currentFile.content;
-        const language = currentFile.language || 'text';
+        const currentContent = files[activeTabId].content!;
+        const language = files[activeTabId].language || 'text';
 
         switch (action) {
             case 'formatCode':
@@ -394,24 +254,15 @@ const CodeEditorLayout: React.FC = () => {
                     const result = await generateCodeFromPrompt(prompt, language);
                     const testFileName = `${activeTabId.split('.')[0]}.test.${language === 'typescript' ? 'ts' : 'js'}`;
                     const testFileId = `${testFileName}-${Date.now()}`;
-
-                    const newTestFile: EditorFile = {
+                    const newTestFile: FileNode = {
                         id: testFileId,
                         name: testFileName,
-                        path: `/${testFileName}`,
+                        type: 'file',
+                        parentId: 'root',
                         content: result.code,
-                        language: language,
-                        isDirty: false,
-                        isOpen: true,
-                        lastModified: Date.now(),
-                        encoding: 'utf-8',
-                        lineEnding: 'LF',
-                        indentSize: 4,
-                        indentUsingSpaces: true,
-                        trimWhitespace: true
+                        language: language
                     };
-
-                    addFile(newTestFile);
+                    setFiles(prev => ({ ...prev, [testFileId]: newTestFile }));
                     handleFileSelect(testFileId);
                 } catch (error) {
                     console.error('Test generation error:', error);
@@ -423,59 +274,48 @@ const CodeEditorLayout: React.FC = () => {
             default:
                 console.log(`Action ${action} triggered`);
         }
-    }, [activeTabId, storeFiles, handleContentChange, handleFileSelect, addFile]);
+    }, [activeTabId, files, handleContentChange, handleFileSelect]);
 
     const handleAIExplain = useCallback(async () => {
-        if (!activeTabId) return;
-
-        const currentFile = storeFiles[activeTabId];
-        if (!currentFile?.content) return;
-
+        if (!activeTabId || !files[activeTabId]?.content) return;
         setAiWorking(true);
+        setActiveSidebarView('ai_chat' as any);
+        toggleSidebar();
+
         try {
-            const result = await explainCode(currentFile.content, currentFile.language || 'text');
+            const result = await explainCode(files[activeTabId].content!, files[activeTabId].language || 'text');
             alert(result.explanation);
         } catch (error) {
             console.error('Explanation error:', error);
         } finally {
             setAiWorking(false);
         }
-    }, [activeTabId, storeFiles]);
+    }, [activeTabId, files]);
 
     const handleAIRefactor = useCallback(async () => {
-        if (!activeTabId) return;
-
-        const currentFile = storeFiles[activeTabId];
-        if (!currentFile?.content) return;
-
+        if (!activeTabId || !files[activeTabId]?.content) return;
         setAiWorking(true);
         try {
-            const result = await refactorCode(currentFile.content, currentFile.language || 'text');
+            const result = await refactorCode(files[activeTabId].content!, files[activeTabId].language || 'text');
             handleContentChange(result.refactoredCode);
         } catch (error) {
             console.error('Refactoring error:', error);
         } finally {
             setAiWorking(false);
         }
-    }, [activeTabId, storeFiles, handleContentChange]);
+    }, [activeTabId, files, handleContentChange]);
+
+    const renderIcon = (icon: React.ReactNode) => {
+        if (React.isValidElement(icon)) {
+            return icon;
+        }
+        return <div>⚠️</div>;
+    };
 
     const activeFile = activeTabId ? storeFiles[activeTabId] : null;
 
-    // Convert EditorFile Record to FileNode Record for components that expect it
-    const filesRecord: Record<string, FileNode> = Object.entries(storeFiles).reduce((acc, [id, file]) => {
-        acc[id] = {
-            id: file.id,
-            name: file.name,
-            type: 'file' as const,
-            parentId: 'root',
-            content: file.content,
-            language: file.language
-        };
-        return acc;
-    }, {} as Record<string, FileNode>);
-
     return (
-        <div className="h-screen flex flex-col bg-[#1a1a1a] overflow-hidden">
+        <div className="h-screen flex flex-col bg-gradient-to-b from-[#0f111a] to-[#1a1d2e] overflow-hidden">
             {/* Top Menu / Header */}
             <TopMenuBar
                 onAIExplain={handleAIExplain}
@@ -486,22 +326,22 @@ const CodeEditorLayout: React.FC = () => {
             {/* Main Body */}
             <div className="flex-1 flex overflow-hidden">
                 <ActivityBar
-                    activeView={activeSidebarView}
-                    setActiveView={setActiveSidebarView}
-                    sidebarVisible={sidebarOpen}
+                    activeView={activeSidebarView as any}
+                    setActiveView={setActiveSidebarView as any}
+                    sidebarVisible={sidebarVisible}
                     toggleSidebar={toggleSidebar}
                     onToolClick={() => {
-                        setActiveSidebarView('tools');
+                        setActiveSidebarView('tools' as any);
                         toggleSidebar();
                     }}
                 />
 
                 {/* Sidebar */}
-                {sidebarOpen && (
-                    <div className="w-72 bg-[#1a1a1a] border-r border-[#333333] flex flex-col">
+                {sidebarVisible && (
+                    <div className="w-72 bg-gradient-to-b from-[#1a1d2e] to-[#0f111a] border-r border-[#2a2f45] flex flex-col">
                         {activeSidebarView === 'explorer' ? (
                             <FileExplorer
-                                files={filesRecord}
+                                files={fileSystemFiles as any}
                                 onSelect={handleFileSelect}
                                 onCreate={handleCreateFile}
                                 onDelete={handleDeleteFile}
@@ -509,7 +349,7 @@ const CodeEditorLayout: React.FC = () => {
                             />
                         ) : activeSidebarView === 'search' ? (
                             <SearchView
-                                files={filesRecord}
+                                files={fileSystemFiles as any}
                                 onOpenMatch={handleOpenSearchMatch}
                             />
                         ) : activeSidebarView === 'ai_chat' ? (
@@ -521,7 +361,7 @@ const CodeEditorLayout: React.FC = () => {
                                 categories={TOOL_CATEGORIES}
                             />
                         ) : (
-                            <div className="p-4 text-center text-[#f5f5f5] text-sm">
+                            <div className="p-4 text-center text-gray-500 text-sm italic">
                                 {activeSidebarView.charAt(0).toUpperCase() + activeSidebarView.slice(1)} view not implemented.
                             </div>
                         )}
@@ -541,25 +381,23 @@ const CodeEditorLayout: React.FC = () => {
                 {/* Editor Area */}
                 <div className={`flex-1 flex flex-col overflow-hidden ${toolsPanelVisible ? 'mr-80' : ''}`}>
                     {/* Tabs */}
-                    <div className="flex bg-[#1a1a1a] overflow-x-auto border-b border-[#333333]">
-                        {openTabs.map(tabId => {
-                            const file = storeFiles[tabId];
-                            if (!file) return null;
-
+                    <div className="flex bg-[#252526] overflow-x-auto no-scrollbar border-b border-[#1e1e1e]">
+                        {openTabs.map(tid => {
+                            const f = storeFiles[tid];
                             return (
                                 <div
-                                    key={tabId}
-                                    onClick={() => setActiveTab(tabId)}
-                                    className={`group min-w-[120px] max-w-[200px] h-9 flex items-center px-3 cursor-pointer border-r border-[#333333] select-none text-xs transition-all duration-200 ${activeTabId === tabId
-                                        ? 'bg-[#333333] text-[#f5f5f5] border-t-2 border-t-[#00d9ff]'
-                                        : 'bg-[#1a1a1a] text-[#f5f5f5] hover:bg-[#333333]'
+                                    key={tid}
+                                    onClick={() => setActiveTab(tid)}
+                                    className={`group min-w-[120px] max-w-[200px] h-9 flex items-center px-3 cursor-pointer border-r border-[#1e1e1e] select-none text-xs transition-all duration-200 ${activeTabId === tid
+                                        ? 'bg-[#1e1e1e] text-white border-t-2 border-t-[#007acc]'
+                                        : 'bg-[#2d2d2d] text-gray-500 hover:bg-[#333333] hover:text-white'
                                         }`}
                                 >
-                                    <FileCode size={14} className="mr-2 text-[#00d9ff]" />
-                                    <span className="truncate flex-1">{file.name}</span>
+                                    <FileCode size={14} className="mr-2 text-[#007acc]" />
+                                    <span className="truncate flex-1">{f.name}</span>
                                     <button
-                                        onClick={(e) => closeTab(tabId, e)}
-                                        className="ml-2 p-0.5 hover:bg-[#333333] hover:text-[#f5f5f5] opacity-0 group-hover:opacity-100 transition-all duration-200"
+                                        onClick={(e) => closeTab(tid, e)}
+                                        className="ml-2 p-0.5 rounded hover:bg-[#444] hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-200"
                                     >
                                         <X size={12} />
                                     </button>
@@ -567,7 +405,7 @@ const CodeEditorLayout: React.FC = () => {
                             );
                         })}
                         {openTabs.length === 0 && (
-                            <div className="flex-1 flex items-center justify-center text-[#f5f5f5] text-[10px]">
+                            <div className="flex-1 flex items-center justify-center text-gray-600 text-[10px] italic">
                                 No files open
                             </div>
                         )}
@@ -575,36 +413,33 @@ const CodeEditorLayout: React.FC = () => {
 
                     {/* Breadcrumbs */}
                     {activeFile && (
-                        <div className="bg-[#1a1a1a] h-8 flex items-center justify-between px-4 text-[11px] text-[#f5f5f5] border-b border-[#333333]">
+                        <div className="bg-[#1e1e1e] h-8 flex items-center justify-between px-4 text-[11px] text-gray-500 border-b border-[#1e1e1e]">
                             <div className="flex items-center space-x-1">
                                 <FolderOpen size={12} />
                                 <span>my-project</span>
                                 <span>&gt;</span>
-                                <span className="text-[#f5f5f5] font-medium">{activeFile.name}</span>
+                                <span className="text-gray-300 font-medium">{activeFile.name}</span>
                             </div>
                         </div>
                     )}
 
                     {/* Editor Container */}
-                    <div className="flex-1 relative bg-[#1a1a1a]">
+                    <div className="flex-1 relative bg-gradient-to-br from-[#0f111a] to-[#1a1d2e]">
                         {activeFile ? (
                             <CodeEditor
                                 content={activeFile.content || ''}
                                 language={activeFile.language || 'typescript'}
                                 onChange={handleContentChange}
-                                onMount={handleEditorMount}
-                                onCursorPositionChange={handleCursorPositionChange}
-                                onScrollChange={handleScrollChange}
-                                onViewportChange={handleViewportChange}
+                                onMount={(editor) => { editorRef.current = editor; }}
                             />
                         ) : (
                             <div className="h-full flex flex-col items-center justify-center space-y-6 opacity-50 select-none">
-                                <Sparkles size={100} className="text-[#00d9ff]" />
-                                <div className="text-3xl font-bold tracking-tight text-[#00d9ff]">LUMINA STUDIO</div>
-                                <div className="grid grid-cols-2 gap-4 text-sm font-medium text-[#f5f5f5]">
-                                    <div className="text-right">Open File</div><div>Ctrl + O</div>
-                                    <div className="text-right">Search</div><div>Ctrl + F</div>
-                                    <div className="text-right">Command Palette</div><div>Ctrl + Shift + K</div>
+                                <Sparkles size={100} className="text-[#7c3aed]" />
+                                <div className="text-3xl font-bold tracking-tight bg-gradient-to-r from-[#4ec9b0] to-[#7c3aed] bg-clip-text text-transparent">LUMINA Code Studio</div>
+                                <div className="grid grid-cols-2 gap-4 text-sm font-medium">
+                                    <div className="text-right text-gray-400">Open File</div><div className="text-gray-200">Ctrl + O</div>
+                                    <div className="text-right text-gray-400">Search</div><div className="text-gray-200">Ctrl + Shift + F</div>
+                                    <div className="text-right text-gray-400">Terminal</div><div className="text-gray-200">Ctrl + `</div>
                                 </div>
                             </div>
                         )}
@@ -613,15 +448,15 @@ const CodeEditorLayout: React.FC = () => {
                         {activeFile && (
                             <div className="absolute bottom-4 right-8 flex gap-2">
                                 <button
-                                    onClick={() => toggleTerminal()}
-                                    className="flex items-center justify-center bg-[#333333] hover:bg-[#00d9ff] text-[#f5f5f5] hover:text-[#1a1a1a] p-3 shadow-xl border border-[#333333] hover:border-[#00d9ff] transition-all duration-300"
+                                    onClick={toggleTerminal}
+                                    className="flex items-center justify-center bg-[#252a3d] hover:bg-gradient-to-r hover:from-[#7c3aed] hover:to-[#4ec9b0] text-gray-300 hover:text-white p-3 rounded-full shadow-xl border border-[#2a2f45] hover:border-transparent transition-all duration-300 hover:scale-110"
                                     title="Toggle Terminal"
                                 >
                                     <TerminalIcon size={20} />
                                 </button>
                                 <button
                                     onClick={() => setToolsPanelVisible(!toolsPanelVisible)}
-                                    className="flex items-center justify-center bg-[#00d9ff] hover:bg-[#f5f5f5] text-[#1a1a1a] hover:text-[#1a1a1a] p-3 shadow-xl transition-all duration-300"
+                                    className="flex items-center justify-center bg-gradient-to-r from-[#7c3aed] to-[#4ec9b0] hover:from-[#6d28d9] hover:to-[#3db8a0] text-white p-3 rounded-full shadow-xl transition-all duration-300 hover:scale-110"
                                     title="Tools Panel"
                                 >
                                     <Zap size={20} />
@@ -631,8 +466,8 @@ const CodeEditorLayout: React.FC = () => {
                     </div>
 
                     {/* Terminal */}
-                    {terminalVisible && (
-                        <Terminal onClose={() => toggleTerminal()} />
+                    {terminalVisibleFromStore && (
+                        <Terminal onClose={toggleTerminal} />
                     )}
                 </div>
             </div>
@@ -644,16 +479,17 @@ const CodeEditorLayout: React.FC = () => {
             />
 
             {/* Command Palette */}
-            <CommandPalette />
-            <SearchPanel />
-            <GoToLineDialog />
+            {commandPaletteOpen && (
+                <CommandPalette />
+            )}
 
+            {/* Quick Open Modal */}
             <QuickOpenModal
-                isOpen={quickOpenVisible}
-                files={filesRecord}
+                isOpen={quickOpenOpen}
+                files={fileSystemFiles as any}
                 openTabIds={openTabs}
                 onOpenFile={handleFileSelect}
-                onClose={() => setQuickOpenVisible(false)}
+                onClose={toggleQuickOpen}
             />
         </div>
     );

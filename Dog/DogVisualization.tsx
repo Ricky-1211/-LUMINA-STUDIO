@@ -78,7 +78,7 @@ function DogVisualization({ onEnterEditor }: DogVisualizationProps) {
                     <div className="left"></div>
                     <div className="right">
                         <p>
-                            Dogstudio is a multidisciplinary <br />
+                           LUMINA STUDIO  is a multidisciplinary <br />
                             creative studio at the intersection <br />
                             of art, design and technology.
                         </p>

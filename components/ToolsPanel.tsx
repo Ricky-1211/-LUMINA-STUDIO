@@ -13,6 +13,15 @@ interface ToolsPanelProps {
   isDocked?: boolean;
 }
 
+// Helper function to render icon from icon object
+const renderIcon = (icon: { component: any; size: number }) => {
+  const IconComponent = icon.component;
+  if (!IconComponent || typeof IconComponent !== 'function') {
+    return <Zap size={icon.size} />;
+  }
+  return <IconComponent size={icon.size} />;
+};
+
 const ToolsPanel: React.FC<ToolsPanelProps> = ({
   activeTool,
   onToolSelect,
@@ -30,7 +39,9 @@ const ToolsPanel: React.FC<ToolsPanelProps> = ({
         {/* Tool Header */}
         <div className="h-12 border-b border-[#1e1e1e] flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <div className="text-blue-400">{activeTool.icon}</div>
+            <div className="text-blue-400">
+              {renderIcon(activeTool.icon)}
+            </div>
             <span className="text-white font-medium">{activeTool.name}</span>
           </div>
           <button 
@@ -57,7 +68,9 @@ const ToolsPanel: React.FC<ToolsPanelProps> = ({
                 className="w-full flex items-center justify-between p-3 bg-[#2d2d2d] hover:bg-[#37373d] rounded-lg transition-all duration-200"
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-green-400">{action.icon}</div>
+                  <div className="text-green-400">
+                    {renderIcon(action.icon)}
+                  </div>
                   <div>
                     <div className="text-white text-sm font-medium">{action.name}</div>
                     <div className="text-gray-400 text-xs">{action.description}</div>
@@ -129,7 +142,9 @@ const ToolsPanel: React.FC<ToolsPanelProps> = ({
                 onClick={() => onToolSelect?.(tool)}
                 className="w-full flex items-center gap-3 p-2.5 hover:bg-[#2d2d2d] rounded-lg transition-all duration-200"
               >
-                <div className="text-blue-400">{tool.icon}</div>
+                <div className="text-blue-400">
+                  {renderIcon(tool.icon)}
+                </div>
                 <div className="text-left">
                   <div className="text-white text-sm font-medium">{tool.name}</div>
                   <div className="text-gray-400 text-xs">{tool.description}</div>
@@ -145,7 +160,7 @@ const ToolsPanel: React.FC<ToolsPanelProps> = ({
         {categories.map(category => (
           <div key={category.id} className="mb-6">
             <h3 className="text-gray-300 text-sm font-medium mb-3 flex items-center gap-2">
-              {category.icon}
+              {renderIcon(category.icon)}
               {category.name}
             </h3>
             <div className="grid grid-cols-2 gap-3">
@@ -155,7 +170,9 @@ const ToolsPanel: React.FC<ToolsPanelProps> = ({
                   onClick={() => onToolSelect?.(tool)}
                   className="flex flex-col items-center p-3 bg-[#2d2d2d] hover:bg-[#37373d] rounded-lg transition-all duration-200"
                 >
-                  <div className="text-blue-400 mb-2">{tool.icon}</div>
+                  <div className="text-blue-400 mb-2">
+                    {renderIcon(tool.icon)}
+                  </div>
                   <span className="text-white text-xs font-medium">{tool.name}</span>
                   <span className="text-gray-400 text-[10px] mt-1 text-center">{tool.description}</span>
                 </button>

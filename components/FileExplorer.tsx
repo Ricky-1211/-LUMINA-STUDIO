@@ -1,7 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, FileCode, Folder, Plus, Trash2, FilePlus, FolderPlus } from 'lucide-react';
 import { FileNode, FileType } from '../types';
+import { useFileSystemStore } from '../store';
 
 interface FileExplorerProps {
   files: Record<string, FileNode>;
@@ -18,15 +18,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   onDelete, 
   activeFileId 
 }) => {
-  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['root']));
-
-  const toggleFolder = (id: string) => {
-    const newExpanded = new Set(expandedFolders);
-    if (newExpanded.has(id)) newExpanded.delete(id);
-    else newExpanded.add(id);
-    setExpandedFolders(newExpanded);
-  };
-
+  const { expandedFolders, toggleFolder, expandFolder, collapseFolder, expandAll, collapseAll } = useFileSystemStore();
+  
   const renderTree = (parentId: string | null = null, depth = 0) => {
     // Cast Object.values to FileNode[] to fix 'unknown' type inference issues in TypeScript
     const children = (Object.values(files) as FileNode[])

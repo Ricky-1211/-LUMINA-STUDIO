@@ -1,11 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   margin: 0;
-  background: #1e1e1e;
+  background: #1a1a1a;
+  color: #f5f5f5;
 }
 
 .monaco-editor {
@@ -19,37 +22,149 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background: #1a1a1a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 5px;
+  background: #333333;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: #555555;
 }
 
 /* Font for code */
 .code-font {
-  font-family: 'Fira Code', monospace;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 /* Monaco Editor customizations */
 .monaco-editor .margin {
-  background-color: #1e1e1e !important;
+  background-color: #1a1a1a !important;
 }
 
 /* Activity bar styling */
 .activity-bar {
+  background: #1a1a1a;
+  border-right: 1px solid #333333;
+}
+
+/* Search highlight effect for smooth scrolling */
+.lumina-search-highlight {
+  background-color: rgba(0, 217, 255, 0.3) !important;
+  border: 1px solid #00d9ff !important;
+  border-radius: 2px !important;
+  animation: pulse 2s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(0, 217, 255, 0.6);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+  }
+  50% {
+    background-color: rgba(0, 217, 255, 0.3);
+    box-shadow: 0 0 5px rgba(0, 217, 255, 0.4);
+  }
+  100% {
+    background-color: rgba(0, 217, 255, 0.1);
+    box-shadow: 0 0 2px rgba(0, 217, 255, 0.2);
+  }
+}
+
+/* Enhanced smooth scrolling */
+.monaco-editor .scrollbar {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  scroll-behavior: smooth;
+}
+
+.monaco-editor .scrollbar:hover {
+  opacity: 1;
+}
+
+.monaco-editor .scrollbar .slider {
   background: #333333;
-  border-right: 1px solid #1e1e1e;
+  border-radius: 0;
+}
+
+.monaco-editor .scrollbar .slider:hover {
+  background: #555555;
+}
+
+/* Perfect scrolling behavior */
+.monaco-editor .monaco-scrollable-element {
+  scroll-behavior: smooth;
+  overflow-scrolling: touch;
+}
+
+/* Line number highlighting */
+.monaco-editor .current-line {
+  border-left: 2px solid #00d9ff !important;
+}
+
+.monaco-editor .line-numbers {
+  background-color: #1a1a1a !important;
+}
+
+/* Cursor enhancements */
+.monaco-editor .cursor {
+  animation: blink 1s infinite;
+  color: #00d9ff;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Enhanced selection */
+.monaco-editor .selected-text {
+  background-color: rgba(0, 217, 255, 0.2) !important;
+}
+
+/* Perfect line height and spacing */
+.monaco-editor .view-lines {
+  line-height: 1.6;
+}
+
+.monaco-editor .view-line {
+  height: 22px;
+}
+
+/* Enhanced focus indicator */
+.monaco-editor:focus {
+  outline: 2px solid #00d9ff;
+  outline-offset: -2px;
+}
+
+/* Smooth transitions for all editor elements */
+.monaco-editor * {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 /* Status bar styling */
 .status-bar {
-  background: #007acc;
-  color: white;
+  background: #1a1a1a;
+  color: #f5f5f5;
   font-size: 12px;
+  border-top: 1px solid #333333;
+}
+
+/* Remove all rounded corners */
+* {
+  border-radius: 0 !important;
+}
+
+/* Cyan accent color */
+.accent-cyan {
+  color: #00d9ff;
+}
+
+.bg-accent-cyan {
+  background-color: #00d9ff;
+}
+
+.border-accent-cyan {
+  border-color: #00d9ff;
 }

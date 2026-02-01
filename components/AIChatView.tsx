@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Bot, User, Loader2, Trash2, Sparkles, Copy, Check, Download, Upload, Code, History, Bug, Plus, Wand2, X } from 'lucide-react';
 import { ChatMessage } from '../types';
 import { chatWithGemini } from '../services/geminiService';
+import { useUIStore } from '../store';
 
 interface ChatHistory {
   id: string;
@@ -24,7 +25,7 @@ const AIChatView: React.FC = () => {
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { addNotification } = useUIStore();
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -70,19 +71,29 @@ const AIChatView: React.FC = () => {
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.response || response,
+        content: response.response || 'I apologize, but I couldn\'t process your request. Please try again.',
         timestamp: Date.now()
       };
 
       setMessages(prev => [...prev, assistantMsg]);
     } catch (error) {
       console.error('Chat error:', error);
+      
+      // Show notification for better UX
+      addNotification({
+        type: 'error',
+        title: 'AI Chat Error',
+        message: 'Failed to get response from AI. Please check your API configuration.',
+        duration: 5000
+      });
+      
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again or check your API configuration.',
         timestamp: Date.now()
       };
+      
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsTyping(false);

@@ -46,7 +46,7 @@ export interface ToolAction {
   id: string;
   name: string;
   description: string;
-  icon: React.ReactNode;
+  icon: { component: any; size: number };
   data?: any;
 }
 
@@ -55,7 +55,7 @@ export interface Tool {
   name: string;
   shortName: string;
   description: string;
-  icon: React.ReactNode;
+  icon: { component: any; size: number };
   category: string;
   actions?: ToolAction[];
 }
@@ -63,6 +63,6 @@ export interface Tool {
 export interface ToolCategory {
   id: string;
   name: string;
-  icon: React.ReactNode;
+  icon: { component: any; size: number };
   tools: Tool[];
 }

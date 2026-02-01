@@ -80,7 +80,7 @@ export interface AIConfig {
 
 // Initialize Gemini AI client
 const getAIClient = () => {
-  const apiKey = process.env.API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
+  const apiKey = process.env.API_KEY || (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY);
   if (!apiKey) {
     throw new Error('API key is required. Set process.env.API_KEY or VITE_GEMINI_API_KEY');
   }
