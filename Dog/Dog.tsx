@@ -19,7 +19,7 @@ interface DogMaterialUniforms {
 
 // Extend THREE.MeshMatcapMaterial to include onBeforeCompile
 interface ExtendedMatcapMaterial extends THREE.MeshMatcapMaterial {
-  onBeforeCompile?: (parameters: THREE.Shader, renderer: THREE.WebGLRenderer) => void;
+  onBeforeCompile: (parameters: THREE.WebGLProgramParametersWithUniforms, renderer: THREE.WebGLRenderer) => void;
 }
 
 const Dog: React.FC = () => {

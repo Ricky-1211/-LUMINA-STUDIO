@@ -330,9 +330,10 @@ const Index: React.FC<IndexProps> = ({ embedded = false }) => {
   }, [activeTabId, files, handleContentChange]);
 
   // Helper function to render icons safely
-  const renderIcon = (icon: React.ReactNode) => {
-    if (React.isValidElement(icon)) {
-      return icon;
+  const renderIcon = (icon: { component: any; size: number }) => {
+    const IconComponent = icon.component;
+    if (IconComponent && React.isValidElement(<IconComponent size={icon.size} />)) {
+      return <IconComponent size={icon.size} />;
     }
     return <div>⚠️</div>; // Fallback icon
   };

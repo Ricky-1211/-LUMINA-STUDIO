@@ -1,11 +1,15 @@
 {
   "include": [
-    "client/src/**/*",
     "components/**/*",
     "services/**/*",
     "Dog/**/*",
     "shared/**/*",
     "server/**/*",
+    "lib/**/*",
+    "hooks/**/*",
+    "store/**/*",
+    "pages/**/*",
+    "contexts/**/*",
     "*.ts",
     "*.tsx"
   ],
@@ -25,8 +29,9 @@
     "baseUrl": ".",
     "types": ["node", "vite/client"],
     "paths": {
-      "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
+      "@/*": ["./*"],
+      "@shared/*": ["./shared/*"],
+      "@assets/*": ["./attached_assets/*"]
     }
   }
 }
