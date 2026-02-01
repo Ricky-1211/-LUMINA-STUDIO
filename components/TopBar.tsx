@@ -1,6 +1,7 @@
 import { Menu, Settings, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useEditorStore } from '@/store/editorStore';
+import { useUIStore } from '@/store/uiStore';
 
 interface TopBarProps {
   onSettingsClick: () => void;
@@ -8,7 +9,7 @@ interface TopBarProps {
 }
 
 export default function TopBar({ onSettingsClick, onHelpClick }: TopBarProps) {
-  const { toggleSidebar, toggleCommandPalette } = useEditorStore();
+  const { toggleSidebar, toggleCommandPalette } = useUIStore();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (

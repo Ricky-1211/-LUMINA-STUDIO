@@ -123,14 +123,14 @@ export default function EnhancedSidebar() {
           </div>
         )}
 
-        {files.length === 0 ? (
+        {Object.keys(files).length === 0 ? (
           <div className="px-4 py-8 text-center text-muted-foreground text-xs">
             <p>No files</p>
             <p className="mt-2 text-xs">Click + to create a new file</p>
           </div>
         ) : (
           <div className="py-2">
-            {files.map((file) => (
+            {Object.values(files).map((file) => (
               <div
                 key={file.id}
                 className={`file-tree-item group flex items-center justify-between ${
@@ -192,7 +192,7 @@ export default function EnhancedSidebar() {
 
       {/* Footer */}
       <div className="border-t border-border px-4 py-3 text-xs text-muted-foreground">
-        <p>{files.length} file(s)</p>
+        <p>{Object.keys(files).length} file(s)</p>
       </div>
     </div>
   );

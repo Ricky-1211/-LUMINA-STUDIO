@@ -82,7 +82,7 @@ export default function CommandPalette() {
       label: 'Toggle Terminal',
       description: 'Show or hide the terminal',
       action: () => {
-        useUIStore.getState().toggleTerminal();
+        toggleTerminal();
         toggleCommandPalette();
       },
       shortcut: 'Ctrl+`',

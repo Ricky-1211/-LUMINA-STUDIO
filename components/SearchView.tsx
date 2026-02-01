@@ -120,7 +120,7 @@ const SearchView: React.FC<SearchViewProps> = ({ files, onOpenMatch }) => {
 
   const totalMatches = useMemo(() => {
     let total = 0;
-    for (const [, ms] of matchesByFile.entries()) total += ms.length;
+    for (const [, ms] of Array.from(matchesByFile.entries())) total += ms.length;
     return total;
   }, [matchesByFile]);
 

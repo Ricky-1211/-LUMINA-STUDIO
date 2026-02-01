@@ -182,6 +182,12 @@ export function createNewFile(
     language,
     isDirty: false,
     isOpen: true,
+    lastModified: Date.now(),
+    encoding: 'utf-8',
+    lineEnding: 'LF' as const,
+    indentSize: 2,
+    indentUsingSpaces: true,
+    trimWhitespace: true,
   };
 }
 

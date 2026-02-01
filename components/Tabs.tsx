@@ -5,7 +5,7 @@ export default function Tabs() {
   const { files, openTabs, activeTabId, setActiveTab, closeFile } =
     useEditorStore();
 
-  const openFiles = files.filter((f) => openTabs.includes(f.id));
+  const openFiles = Object.values(files).filter((f) => openTabs.includes(f.id));
 
   return (
     <div className="editor-tabs">

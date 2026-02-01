@@ -66,7 +66,12 @@ const AIChatView: React.FC = () => {
     setIsTyping(true);
 
     try {
-      const response = await chatWithGemini([...messages, userMsg]);
+      const response = await chatWithGemini(
+        [...messages, userMsg].map(msg => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }))
+      );
 
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
